@@ -37,12 +37,12 @@ function! s:set_color(group, attr, color)
   execute printf('hi %s %s%s=%s', a:group, gui ? 'gui' : 'cterm', a:attr, a:color)
 endfunction
 
-nnoremap <silent> <Plug>(goyo-off) :call <sid>goyo_off()<cr>
+nnoremap <silent> <Plug>(sssh-off) :call <sid>sssh_off()<cr>
 
 function! s:blank(repel)
-  if bufwinnr(t:goyo_pads.r) <= bufwinnr(t:goyo_pads.l) + 1
-    \ || bufwinnr(t:goyo_pads.b) <= bufwinnr(t:goyo_pads.t) + 3
-    call feedkeys("\<Plug>(goyo-off)")
+  if bufwinnr(t:sssh_pads.r) <= bufwinnr(t:sssh_pads.l) + 1
+    \ || bufwinnr(t:sssh_pads.b) <= bufwinnr(t:sssh_pads.t) + 3
+    call feedkeys("\<Plug>(sssh-off)")
   endif
   execute 'noautocmd wincmd' a:repel
 endfunction
@@ -68,7 +68,7 @@ function! s:setup_pad(bufnr, vert, size, repel)
   let win = bufwinnr(a:bufnr)
   execute win . 'wincmd w'
   execute (a:vert ? 'vertical ' : '') . 'resize ' . max([0, a:size])
-  augroup goyop
+  augroup ssshp
     execute 'autocmd WinEnter,CursorMoved <buffer> nested call s:blank("'.a:repel.'")'
   augroup END
 
@@ -84,26 +84,26 @@ function! s:setup_pad(bufnr, vert, size, repel)
 endfunction
 
 function! s:resize_pads()
-  augroup goyop
+  augroup ssshp
     autocmd!
   augroup END
 
-  let t:goyo_dim.width = s:const(t:goyo_dim.width, 2, &columns)
-  let t:goyo_dim.height = s:const(t:goyo_dim.height, 2, &lines)
+  let t:sssh_dim.width = s:const(t:sssh_dim.width, 2, &columns)
+  let t:sssh_dim.height = s:const(t:sssh_dim.height, 2, &lines)
 
-  let vmargin = max([0, (&lines - t:goyo_dim.height) / 2 - 1])
-  let yoff = s:const(t:goyo_dim.yoff, - vmargin, vmargin)
+  let vmargin = max([0, (&lines - t:sssh_dim.height) / 2 - 1])
+  let yoff = s:const(t:sssh_dim.yoff, - vmargin, vmargin)
   let top = vmargin + yoff
   let bot = vmargin - yoff - 1
-  call s:setup_pad(t:goyo_pads.t, 0, top, 'j')
-  call s:setup_pad(t:goyo_pads.b, 0, bot, 'k')
+  call s:setup_pad(t:sssh_pads.t, 0, top, 'j')
+  call s:setup_pad(t:sssh_pads.b, 0, bot, 'k')
 
   let nwidth  = max([len(string(line('$'))) + 1, &numberwidth])
-  let width   = t:goyo_dim.width + (&number ? nwidth : 0)
+  let width   = t:sssh_dim.width + (&number ? nwidth : 0)
   let hmargin = max([0, (&columns - width) / 2 - 1])
-  let xoff    = s:const(t:goyo_dim.xoff, - hmargin, hmargin)
-  call s:setup_pad(t:goyo_pads.l, 1, hmargin + xoff, 'l')
-  call s:setup_pad(t:goyo_pads.r, 1, hmargin - xoff, 'h')
+  let xoff    = s:const(t:sssh_dim.xoff, - hmargin, hmargin)
+  call s:setup_pad(t:sssh_pads.l, 1, hmargin + xoff, 'l')
+  call s:setup_pad(t:sssh_pads.r, 1, hmargin - xoff, 'h')
 endfunction
 
 function! s:tranquilize()
@@ -112,7 +112,7 @@ function! s:tranquilize()
             \ 'StatusLine', 'StatusLineNC', 'SignColumn']
     " -1 on Vim / '' on GVim
     if bg == -1 || empty(bg)
-      call s:set_color(grp, 'fg', get(g:, 'goyo_bg', 'black'))
+      call s:set_color(grp, 'fg', get(g:, 'sssh_bg', 'black'))
       call s:set_color(grp, 'bg', 'NONE')
     else
       call s:set_color(grp, 'fg', bg)
@@ -123,7 +123,7 @@ function! s:tranquilize()
 endfunction
 
 function! s:hide_linenr()
-  if !get(g:, 'goyo_linenr', 0)
+  if !get(g:, 'sssh_linenr', 0)
     setlocal nonu
     if exists('&rnu')
       setlocal nornu
@@ -145,11 +145,11 @@ endfunction
 
 function! s:maps_resize()
   let commands = {
-  \ '=': ':<c-u>let t:goyo_dim = <sid>parse_arg(t:goyo_dim_expr) <bar> call <sid>resize_pads()<cr>',
-  \ '>': ':<c-u>let t:goyo_dim.width = winwidth(0) + 2 * v:count1 <bar> call <sid>resize_pads()<cr>',
-  \ '<': ':<c-u>let t:goyo_dim.width = winwidth(0) - 2 * v:count1 <bar> call <sid>resize_pads()<cr>',
-  \ '+': ':<c-u>let t:goyo_dim.height += 2 * v:count1 <bar> call <sid>resize_pads()<cr>',
-  \ '-': ':<c-u>let t:goyo_dim.height -= 2 * v:count1 <bar> call <sid>resize_pads()<cr>'
+  \ '=': ':<c-u>let t:sssh_dim = <sid>parse_arg(t:sssh_dim_expr) <bar> call <sid>resize_pads()<cr>',
+  \ '>': ':<c-u>let t:sssh_dim.width = winwidth(0) + 2 * v:count1 <bar> call <sid>resize_pads()<cr>',
+  \ '<': ':<c-u>let t:sssh_dim.width = winwidth(0) - 2 * v:count1 <bar> call <sid>resize_pads()<cr>',
+  \ '+': ':<c-u>let t:sssh_dim.height += 2 * v:count1 <bar> call <sid>resize_pads()<cr>',
+  \ '-': ':<c-u>let t:sssh_dim.height -= 2 * v:count1 <bar> call <sid>resize_pads()<cr>'
   \ }
   let mapped = filter(keys(commands), "empty(maparg(\"\<c-w>\".v:val, 'n'))")
   for c in mapped
@@ -158,9 +158,9 @@ function! s:maps_resize()
   return mapped
 endfunction
 
-nnoremap <silent> <plug>(goyo-resize) :<c-u>call <sid>resize_pads()<cr>
+nnoremap <silent> <plug>(sssh-resize) :<c-u>call <sid>resize_pads()<cr>
 
-function! s:goyo_on(dim)
+function! s:sssh_on(dim)
   let dim = s:parse_arg(a:dim)
   if empty(dim)
     return
@@ -182,37 +182,37 @@ function! s:goyo_on(dim)
   " New tab
   tab split
 
-  let t:goyo_master = winbufnr(0)
-  let t:goyo_dim = dim
-  let t:goyo_dim_expr = a:dim
-  let t:goyo_pads = {}
-  let t:goyo_revert = settings
-  let t:goyo_maps = extend(s:maps_nop(), s:maps_resize())
+  let t:sssh_master = winbufnr(0)
+  let t:sssh_dim = dim
+  let t:sssh_dim_expr = a:dim
+  let t:sssh_pads = {}
+  let t:sssh_revert = settings
+  let t:sssh_maps = extend(s:maps_nop(), s:maps_resize())
   if has('gui_running')
-    let t:goyo_revert.guioptions = &guioptions
+    let t:sssh_revert.guioptions = &guioptions
   endif
 
   " vim-gitgutter
-  let t:goyo_disabled_gitgutter = get(g:, 'gitgutter_enabled', 0)
-  if t:goyo_disabled_gitgutter
+  let t:sssh_disabled_gitgutter = get(g:, 'gitgutter_enabled', 0)
+  if t:sssh_disabled_gitgutter
     silent! GitGutterDisable
   endif
 
   " vim-signify
-  let t:goyo_disabled_signify = !empty(getbufvar(bufnr(''), 'sy'))
-  if t:goyo_disabled_signify
+  let t:sssh_disabled_signify = !empty(getbufvar(bufnr(''), 'sy'))
+  if t:sssh_disabled_signify
     SignifyToggle
   endif
 
   " vim-airline
-  let t:goyo_disabled_airline = exists('#airline')
-  if t:goyo_disabled_airline
+  let t:sssh_disabled_airline = exists('#airline')
+  if t:sssh_disabled_airline
     AirlineToggle
   endif
 
   " vim-powerline
-  let t:goyo_disabled_powerline = exists('#PowerlineMain')
-  if t:goyo_disabled_powerline
+  let t:sssh_disabled_powerline = exists('#PowerlineMain')
+  if t:sssh_disabled_powerline
     augroup PowerlineMain
       autocmd!
     augroup END
@@ -220,8 +220,8 @@ function! s:goyo_on(dim)
   endif
 
   " lightline.vim
-  let t:goyo_disabled_lightline = exists('#lightline')
-  if t:goyo_disabled_lightline
+  let t:sssh_disabled_lightline = exists('#lightline')
+  if t:sssh_disabled_lightline
     silent! call lightline#disable()
   endif
 
@@ -245,64 +245,64 @@ function! s:goyo_on(dim)
     set guioptions-=L
   endif
 
-  let t:goyo_pads.l = s:init_pad('vertical topleft new')
-  let t:goyo_pads.r = s:init_pad('vertical botright new')
-  let t:goyo_pads.t = s:init_pad('topleft new')
-  let t:goyo_pads.b = s:init_pad('botright new')
+  let t:sssh_pads.l = s:init_pad('vertical topleft new')
+  let t:sssh_pads.r = s:init_pad('vertical botright new')
+  let t:sssh_pads.t = s:init_pad('topleft new')
+  let t:sssh_pads.b = s:init_pad('botright new')
 
   call s:resize_pads()
   call s:tranquilize()
 
-  augroup goyo
+  augroup sssh
     autocmd!
-    autocmd TabLeave    * nested call s:goyo_off()
+    autocmd TabLeave    * nested call s:sssh_off()
     autocmd VimResized  *        call s:resize_pads()
     autocmd ColorScheme *        call s:tranquilize()
     autocmd BufWinEnter *        call s:hide_linenr()
     if has('nvim')
-      autocmd TermClose * call feedkeys("\<plug>(goyo-resize)")
+      autocmd TermClose * call feedkeys("\<plug>(sssh-resize)")
     endif
   augroup END
 
-  if exists('g:goyo_callbacks[0]')
-    call g:goyo_callbacks[0]()
+  if exists('g:sssh_callbacks[0]')
+    call g:sssh_callbacks[0]()
   endif
   if exists('#User#GoyoEnter')
     doautocmd User GoyoEnter
   endif
 endfunction
 
-function! s:goyo_off()
-  if !exists('#goyo')
+function! s:sssh_off()
+  if !exists('#sssh')
     return
   endif
 
   " Oops, not this tab
-  if !exists('t:goyo_revert')
+  if !exists('t:sssh_revert')
     return
   endif
 
   " Clear auto commands
-  augroup goyo
+  augroup sssh
     autocmd!
   augroup END
-  augroup! goyo
-  augroup goyop
+  augroup! sssh
+  augroup ssshp
     autocmd!
   augroup END
-  augroup! goyop
+  augroup! ssshp
 
-  for c in t:goyo_maps
+  for c in t:sssh_maps
     execute 'nunmap <c-w>'.escape(c, '|')
   endfor
 
-  let goyo_revert             = t:goyo_revert
-  let goyo_disabled_gitgutter = t:goyo_disabled_gitgutter
-  let goyo_disabled_signify   = t:goyo_disabled_signify
-  let goyo_disabled_airline   = t:goyo_disabled_airline
-  let goyo_disabled_powerline = t:goyo_disabled_powerline
-  let goyo_disabled_lightline = t:goyo_disabled_lightline
-  let goyo_orig_buffer        = t:goyo_master
+  let sssh_revert             = t:sssh_revert
+  let sssh_disabled_gitgutter = t:sssh_disabled_gitgutter
+  let sssh_disabled_signify   = t:sssh_disabled_signify
+  let sssh_disabled_airline   = t:sssh_disabled_airline
+  let sssh_disabled_powerline = t:sssh_disabled_powerline
+  let sssh_disabled_lightline = t:sssh_disabled_lightline
+  let sssh_orig_buffer        = t:sssh_master
   let [line, col]             = [line('.'), col('.')]
 
   if tabpagenr() == 1
@@ -312,37 +312,37 @@ function! s:goyo_off()
   endif
   tabclose
   execute 'normal! '.s:orig_tab.'gt'
-  if winbufnr(0) == goyo_orig_buffer
+  if winbufnr(0) == sssh_orig_buffer
     " Doesn't work if window closed with `q`
     execute printf('normal! %dG%d|', line, col)
   endif
 
-  let wmw = remove(goyo_revert, 'winminwidth')
-  let ww  = remove(goyo_revert, 'winwidth')
+  let wmw = remove(sssh_revert, 'winminwidth')
+  let ww  = remove(sssh_revert, 'winwidth')
   let &winwidth     = ww
   let &winminwidth  = wmw
-  let wmh = remove(goyo_revert, 'winminheight')
-  let wh  = remove(goyo_revert, 'winheight')
+  let wmh = remove(sssh_revert, 'winminheight')
+  let wh  = remove(sssh_revert, 'winheight')
   let &winheight    = max([wmh, 1])
   let &winminheight = wmh
   let &winheight    = wh
 
-  for [k, v] in items(goyo_revert)
+  for [k, v] in items(sssh_revert)
     execute printf('let &%s = %s', k, string(v))
   endfor
   execute 'colo '. get(g:, 'colors_name', 'default')
 
-  if goyo_disabled_gitgutter
+  if sssh_disabled_gitgutter
     silent! GitGutterEnable
   endif
 
-  if goyo_disabled_signify
+  if sssh_disabled_signify
     silent! if !b:sy.active
       SignifyToggle
     endif
   endif
 
-  if goyo_disabled_airline && !exists('#airline')
+  if sssh_disabled_airline && !exists('#airline')
     AirlineToggle
     " For some reason, Airline requires two refreshes to avoid display
     " artifacts
@@ -350,12 +350,12 @@ function! s:goyo_off()
     silent! AirlineRefresh
   endif
 
-  if goyo_disabled_powerline && !exists('#PowerlineMain')
+  if sssh_disabled_powerline && !exists('#PowerlineMain')
     doautocmd PowerlineStartup VimEnter
     silent! PowerlineReloadColorscheme
   endif
 
-  if goyo_disabled_lightline
+  if sssh_disabled_lightline
     silent! call lightline#enable()
   endif
 
@@ -363,8 +363,8 @@ function! s:goyo_off()
     doautocmd Powerline ColorScheme
   endif
 
-  if exists('g:goyo_callbacks[1]')
-    call g:goyo_callbacks[1]()
+  if exists('g:sssh_callbacks[1]')
+    call g:sssh_callbacks[1]()
   endif
   if exists('#User#GoyoLeave')
     doautocmd User GoyoLeave
@@ -379,17 +379,17 @@ function! s:relsz(expr, limit)
 endfunction
 
 function! s:parse_arg(arg)
-  if exists('g:goyo_height') || !exists('g:goyo_margin_top') && !exists('g:goyo_margin_bottom')
-    let height = s:relsz(get(g:, 'goyo_height', '85%'), &lines)
+  if exists('g:sssh_height') || !exists('g:sssh_margin_top') && !exists('g:sssh_margin_bottom')
+    let height = s:relsz(get(g:, 'sssh_height', '85%'), &lines)
     let yoff = 0
   else
-    let top = max([0, s:relsz(get(g:, 'goyo_margin_top', 4), &lines)])
-    let bot = max([0, s:relsz(get(g:, 'goyo_margin_bottom', 4), &lines)])
+    let top = max([0, s:relsz(get(g:, 'sssh_margin_top', 4), &lines)])
+    let bot = max([0, s:relsz(get(g:, 'sssh_margin_bottom', 4), &lines)])
     let height = &lines - top - bot
     let yoff = top - bot
   endif
 
-  let dim = { 'width':  s:relsz(get(g:, 'goyo_width', 80), &columns),
+  let dim = { 'width':  s:relsz(get(g:, 'sssh_width', 80), &columns),
             \ 'height': height,
             \ 'xoff':   0,
             \ 'yoff':   yoff }
@@ -410,27 +410,27 @@ function! s:parse_arg(arg)
   return dim
 endfunction
 
-function! goyo#execute(bang, dim)
+function! sssh#execute(bang, dim)
   if a:bang
-    if exists('#goyo')
-      call s:goyo_off()
+    if exists('#sssh')
+      call s:sssh_off()
     endif
   else
-    if exists('#goyo') == 0
-      call s:goyo_on(a:dim)
+    if exists('#sssh') == 0
+      call s:sssh_on(a:dim)
     elseif !empty(a:dim)
       if winnr('$') < 5
-        call s:goyo_off()
-        return goyo#execute(a:bang, a:dim)
+        call s:sssh_off()
+        return sssh#execute(a:bang, a:dim)
       endif
       let dim = s:parse_arg(a:dim)
       if !empty(dim)
-        let t:goyo_dim = dim
-        let t:goyo_dim_expr = a:dim
+        let t:sssh_dim = dim
+        let t:sssh_dim_expr = a:dim
         call s:resize_pads()
       endif
     else
-      call s:goyo_off()
+      call s:sssh_off()
     end
   end
 endfunction
