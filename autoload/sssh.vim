@@ -167,7 +167,7 @@ function! s:sssh_on(dim)
   endif
 
   let s:orig_tab = tabpagenr()
-  let settings =
+  let settings = {
     \   'showtabline':   &showtabline,
     \   'fillchars':     &fillchars,
     \   'winminwidth':   &winminwidth,
