@@ -3,12 +3,6 @@ goyo.vim ([고요](http://en.wiktionary.org/wiki/고요하다))
 
 Distraction-free writing in Vim.
 
-![](https://raw.github.com/junegunn/i/master/goyo.png)
-
-(Color scheme: [seoul256](https://github.com/junegunn/seoul256.vim))
-
-Best served with [limelight.vim](https://github.com/junegunn/limelight.vim).
-
 Installation
 ------------
 
